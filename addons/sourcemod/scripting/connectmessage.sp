@@ -1,41 +1,47 @@
 #include <sourcemod>
 #include <colors>
 #include <geoip>
-#pragma tabsize 0
 
-public Plugin:myinfo = 
+#pragma semicolon 1
+#pragma newdecls required
+
+public Plugin myinfo = 
 {
-name = "Connect/Disconnect Message",
-author = "X Matei X",
-description = "A simple connect/disconnect message for players.",
-version = "1.0",
-url = "forums.alliedmods.net",
+	name = "Connect/Disconnect Message", 
+	author = "X Matei X, ByDexter", 
+	description = "A simple connect/disconnect message for players.", 
+	version = "1.1", 
+	url = "forums.alliedmods.net", 
 };
 
-
-public OnClientPutInServer(client)
+public void OnPluginStart()
 {
-	new String:name[99], String:IP[99], String:Country[99];
-
-	GetClientName(client, name, sizeof(name));
-	GetClientIP(client, IP, sizeof(IP), true);
-    if(!GeoipCountry(IP, Country, sizeof Country))
-    {
-		Country = "Unknown Country";
-    }  
-	CPrintToChatAll("★ {green}CSGO {default}➜ {purple}%s {default}connected from {green}(%s).", name, Country);
-
+	LoadTranslations("connect-disconnect.phrases");
 }
 
-public OnClientDisconnect(client)
+public void OnClientPutInServer(int client)
 {
-	new String:name[99], String:IP[99], String:Country[99];
-
+	char name[99], IP[99], authid[99], Country[99];
+	GetClientAuthId(client, AuthId_Steam2, authid, sizeof(authid));
 	GetClientName(client, name, sizeof(name));
 	GetClientIP(client, IP, sizeof(IP), true);
-    if(!GeoipCountry(IP, Country, sizeof Country))
-    {
-        Country = "Unknown Country";
-    } 
-	CPrintToChatAll("★ {green}CSGO {default}➜ {purple}%s {default}disconnected from {green}(%s).", name, Country);
+	if (!GeoipCountry(IP, Country, sizeof Country))
+	{
+		Country = "BOT";
+	}
+	CPrintToChatAll("%t", "Connect", name, authid, Country);
+	
 }
+
+public void OnClientDisconnect(int client)
+{
+	char name[99], IP[99], authid[99], Country[99];
+	GetClientAuthId(client, AuthId_Steam2, authid, sizeof(authid));
+	GetClientName(client, name, sizeof(name));
+	GetClientIP(client, IP, sizeof(IP), true);
+	if (!GeoipCountry(IP, Country, sizeof Country))
+	{
+		Country = "BOT";
+	}
+	CPrintToChatAll("★ {green}CSGO {default}➜ {purple}%s {blue}(%s) {default}disconnected from {green}(%s)", "Disconnect", name, authid, Country);
+} 
